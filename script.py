@@ -8,7 +8,7 @@ df = pd.read_excel('data/input.xlsx')
 df['Past Leaders'] = ''
 
 # Sort the DataFrame by time slot and first name
-df.sort_values(['time slot', 'First Name'], inplace=True)
+df.sort_values(['time slot'], inplace=True)
 
 # Create a new column to track the leader status
 df['Leader'] = 0
@@ -17,7 +17,7 @@ df['Leader'] = 0
 grouped = df.groupby('time slot')
 
 # Create a cycle of unique leaders for each group
-leaders = cycle(df['First Name'].unique())
+leaders = cycle(df['Email'])
 
 # Create a new DataFrame to store the groups
 groups = []
@@ -30,36 +30,46 @@ for time_slot, time_slot_data in grouped:
     # Calculate the number of groups needed
     num_groups = len(time_slot_data) // 4
 
+    # Calculate how many people leftover
+    remainder = len(time_slot_data) % 4
+
     # Iterate over each group
     for i in range(num_groups):
         # Get the people for the current group
         group_people = time_slot_data.iloc[i * 4:(i + 1) * 4]
 
+        # Check if a leftover person needs to be added to a group
+        leftover = 0
+        if i < remainder:
+            leftover_person = time_slot_data.iloc[len(time_slot_data) - i - 1: len(time_slot_data) - i]
+            group_people = group_people._append(leftover_person)
+            leftover = 1
+
         # Find a unique leader for the group
         leader = next(leaders)
-        while leader in time_slot_data['Past Leaders'].values or leader in group_people['First Name'].values:
+        while leader in time_slot_data['Past Leaders'].values or leader not in group_people['Email'].values:
             leader = next(leaders)
 
         # Set the leader status for the assigned leader
-        df.loc[df['First Name'] == leader, 'Leader'] = 1
+        df.loc[df['Email'] == leader, 'Leader'] = 1
 
         # Update the past leaders column
-        df.loc[df['First Name'].isin(
-            group_people['First Name']), 'Past Leaders'] += leader + ','
+        df.loc[df['Email'].isin(
+            group_people['Email']), 'Past Leaders'] += leader + ','
 
         # Append the group data to the groups list
         groups.append(pd.DataFrame({
+            'Time Slot': time_slot,
             'Group': i + 1,
-            'time slot': time_slot,
-            'First Name': group_people['First Name'],
-            'Leader': [1] + [0] * 3
+            'Leader': [1] + [0] * (3 + leftover),
+            'Email': group_people['Email']
         }))
 
 # Concatenate the groups list into a single DataFrame
 groups = pd.concat(groups)
 
 # Sort the groups DataFrame by time slot, group, and first name
-groups.sort_values(['time slot', 'Group', 'First Name'], inplace=True)
+groups.sort_values(by=['Time Slot', 'Group', 'Leader', 'Email'], ascending=[True, True, False, True], inplace=True)
 
 # Write the groups DataFrame to a new Excel sheet
 groups.to_excel('output.xlsx', index=False)
