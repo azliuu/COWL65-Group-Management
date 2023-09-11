@@ -5,25 +5,22 @@ from itertools import cycle
 df = pd.read_excel('data/input.xlsx')
 
 # Add an empty "Past Leaders" column to the DataFrame
-# if there isn't one already
-# This column will be used to track which leaders have already led a group
-if 'Past Leaders' not in df.columns:
-    df['Past Leaders'] = ''
-else:
-    df['Past Leaders'] = df['Past Leaders'].astype(
-        str)  # Convert to string type
+df['Past Leaders'] = ''
 
 # Sort the DataFrame by time slot and first name
-df.sort_values(['Time Slot'], inplace=True)
+df.sort_values(['time slot'], inplace=True)
 
 # Create a new column to track the leader status
 df['Leader'] = 0
 
 # Group the DataFrame by time slot
-grouped = df.groupby('Time Slot')
+grouped = df.groupby('time slot')
 
 # Create a cycle of unique leaders for each group
 leaders = cycle(df['Email'])
+
+# Create a set to track used leaders
+used_leaders = set()
 
 # Create a new DataFrame to store the groups
 groups = []
@@ -36,7 +33,7 @@ for time_slot, time_slot_data in grouped:
     # Calculate the number of groups needed
     num_groups = len(time_slot_data) // 4
 
-    # Calculate how many people are leftover
+    # Calculate how many people leftover
     remainder = len(time_slot_data) % 4
 
     # Iterate over each group
@@ -53,36 +50,37 @@ for time_slot, time_slot_data in grouped:
             leftover = 1
 
         # Find a unique leader for the group
-        # Choose a new leader if they were a leader in the past. Ensure that each group will only have one new leader.
         leader = next(leaders)
-        while leader in group_people['Past Leaders'].str.split(',', expand=True).values.flatten():
+        while leader in used_leaders or leader not in group_people['Email'].values:
             leader = next(leaders)
 
         # Set the leader status for the assigned leader
         df.loc[df['Email'] == leader, 'Leader'] = 1
 
         # Update the past leaders column
-        # Add the current leader to the past leaders column for each person in the group
-        group_people.loc[:,
-                         'Past Leaders'] = group_people['Past Leaders'] + leader + ','
-        df.loc[df['Email'].isin(group_people['Email']),
-               'Past Leaders'] = group_people['Past Leaders'].values
+        df.loc[df['Email'].isin(
+            group_people['Email']), 'Past Leaders'] += leader + ','
 
         # Append the group data to the groups list
         groups.append(pd.DataFrame({
             'Time Slot': time_slot,
             'Group': i + 1,
             'Leader': [1] + [0] * (3 + leftover),
-            'Email': group_people['Email'],
-            'Past Leaders': group_people['Past Leaders']
+            'Email': group_people['Email']
         }))
 
+        # Add the used leader to the set
+        used_leaders.add(leader)
+
 # Concatenate the groups list into a single DataFrame
-groups = pd.concat(groups)
+if groups:
+    groups = pd.concat(groups)
 
-# Sort the groups DataFrame by time slot, group, and first name
-groups.sort_values(by=['Time Slot', 'Group', 'Leader', 'Email', 'Past Leaders'], ascending=[
-                   True, True, False, True, True], inplace=True)
+    # Sort the groups DataFrame by time slot, group, leader, and email
+    groups = groups.sort_values(
+        by=['Time Slot', 'Group', 'Leader', 'Email'], ascending=[True, True, False, True])
 
-# Write the groups DataFrame to a new Excel sheet
-groups.to_excel('output.xlsx', index=False)
+    # Write the groups DataFrame to a new Excel sheet
+    groups.to_excel('output.xlsx', index=False)
+else:
+    print("No groups to concatenate.")
