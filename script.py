@@ -8,13 +8,14 @@ df = pd.read_excel('data/input.xlsx')
 # df['Past Leaders'] = ''
 
 # Sort the DataFrame by time slot and first name
-print("this is timeslot", df['Time Slot'])
+# print("this is timeslot", df['Time Slot'])
 # print(df.sort_values(['Time Slot'], inplace=True))
 df.sort_values(['Time Slot'], inplace=True)
 
 # if leader column doesn't exist create leader column
 if 'Leader' not in df.columns:
     df['Leader'] = 0
+
 
 for index, row in df.iterrows():
     if (row['Leader'] == 1):
@@ -25,6 +26,7 @@ grouped = df.groupby('Time Slot')
 
 # Create a new DataFrame to store the groups
 groups = []
+
 
 # Iterate over each time slot
 for time_slot, time_slot_data in grouped:
@@ -58,10 +60,10 @@ for time_slot, time_slot_data in grouped:
 
        # Find a unique leader for the group
         leader = group_people.iloc[0]['Email']
-        print("leader: ")
-        print(leader)
-        print("group people: ")
-        print(group_people)
+        # print("leader: ")
+        # print(leader)
+        # print("group people: ")
+        # print(group_people)
         # print(group_people[group_people['Leader']])
         # print("gp e")
         # print(group_people['Email'][0])
@@ -94,21 +96,7 @@ for time_slot, time_slot_data in grouped:
             # print(leader)
         # Set the leader status for the assigned leader
         df.loc[df['Email'] == leader, 'Leader'] = 1
-        # print(leaders)
-        # print("this is leader: ")
-        # print(leader)
-        # print("this is value of leader: ")
-        # print(df.loc[df['Email'] == leader, 'Leader'])
 
-        # Update the past leaders column
-        # df.loc[df['Email'].isin(group_people['Email']),
-        #        'Past Leaders'] += leader + ','
-
-        # Append the group data to the groups list, maintaining '-1' for leaders
-        # print(group_people['Leader'])
-        # print("this is email: ")
-        # print(group_people['Email'])
-        # print(group_people['Leader'])
         group_data = {
             'Time Slot': time_slot,
             'Group': i + 1,
@@ -120,6 +108,33 @@ for time_slot, time_slot_data in grouped:
             'Email': group_people['Email']
         }
         groups.append(pd.DataFrame(group_data))
+
+        # print("leader")
+        # print(df['Leader'])
+        # df.style.highlight_max(subset=['Leader'] == 1, color='yellow')
+        # # color all the leaders orange
+        # print("bizza3")
+
+        # def color_leader(col):
+        #     if col.name == 'Leader':
+        #         print("bizza4")
+        #         return ['background-color: orange' if x == 1 else '' for x in col]
+
+        # color all the leaders orange
+        # data = pd.DataFrame(group_data)
+        # data.style.apply(color_leader)
+
+        # print("bizza5")
+        # def color_leader(s):
+        #     """
+        #     function to color the leader
+        #     """
+        #     print("s")
+        #     print(s['Leader'])
+        #     if s['Leader'] == 1:
+        #         return 'background-color: yellow'
+        #     else:
+        #         return ''
 
         # Add the used leader to the set for this time slot
         used_leaders.add(leader)
@@ -136,3 +151,24 @@ if groups:
     groups.to_excel('output.xlsx', index=False)
 else:
     print("No groups to concatenate.")
+
+
+# Reset the index of the 'groups' DataFrame to make it unique
+groups.reset_index(drop=True, inplace=True)
+
+# Reset the index of the 'groups' DataFrame to make it unique
+groups.reset_index(drop=True, inplace=True)
+
+# Define a function to color the 'Leader' column cells where the value is 1
+
+
+def color_leader(val):
+    color = 'background-color: orange' if val == 1 else ''
+    return color
+
+
+# Apply the color_leader function to the 'Leader' column in the 'groups' DataFrame
+styled_df = groups.style.map(color_leader, subset=['Leader'])
+
+# Save the styled DataFrame to an Excel file
+styled_df.to_excel('output.xlsx', engine='openpyxl', index=False)
