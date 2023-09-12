@@ -4,23 +4,19 @@ from itertools import cycle
 # Read the Excel sheet into a pandas DataFrame
 df = pd.read_excel('data/input.xlsx')
 
-# Add an empty "Past Leaders" column to the DataFrame
-df['Past Leaders'] = ''
+# # Add an empty "Past Leaders" column to the DataFrame
+# df['Past Leaders'] = ''
 
 # Sort the DataFrame by time slot and first name
-df.sort_values(['time slot'], inplace=True)
+df.sort_values(['Time Slot'], inplace=True)
 
-# Create a new column to track the leader status
-df['Leader'] = 0
+# Mark leaders with '1' as '-1' when first read and reset Leader column
+for index, row in df.iterrows():
+    if row['Leader'] == 1:
+        df.at[index, 'Leader'] = -1
 
 # Group the DataFrame by time slot
-grouped = df.groupby('time slot')
-
-# Create a cycle of unique leaders for each group
-leaders = cycle(df['Email'])
-
-# Create a set to track used leaders
-used_leaders = set()
+grouped = df.groupby('Time Slot')
 
 # Create a new DataFrame to store the groups
 groups = []
@@ -33,8 +29,14 @@ for time_slot, time_slot_data in grouped:
     # Calculate the number of groups needed
     num_groups = len(time_slot_data) // 4
 
-    # Calculate how many people leftover
+    # Calculate how many people are leftover
     remainder = len(time_slot_data) % 4
+
+    # Create a cycle of unique leaders for each group
+    leaders = cycle(time_slot_data['Email'])
+
+    # Create a set to track used leaders for this time slot
+    used_leaders = set()
 
     # Iterate over each group
     for i in range(num_groups):
@@ -49,27 +51,59 @@ for time_slot, time_slot_data in grouped:
             group_people = pd.concat([group_people, leftover_person])
             leftover = 1
 
-        # Find a unique leader for the group
-        leader = next(leaders)
-        while leader in used_leaders or leader not in group_people['Email'].values:
-            leader = next(leaders)
-
+       # Find a unique leader for the group
+        leader = group_people.iloc[0]['Email']
+        # while (
+        # leader in group_people['Email'].values or
+        # leader in used_leaders or
+        # (df.loc[df['Email'] == leader, 'Leader'].any() == -1)
+        # ):
+        # If the currently selected leader is marked as '-1',
+        # try to find a member marked as '0' to be the new leader.
+        if df.loc[df['Email'] == leader, 'Leader'].any() == -1:
+            new_leader_candidates = group_people[group_people['Leader'] == 0]
+            if not new_leader_candidates.empty:
+                leader = new_leader_candidates.iloc[0]['Email']
+            else:
+                # If no '0' leader candidates are available, select a member marked as '-1'.
+                leader = next(
+                    group_people[group_people['Leader'] == -1]['Email'].iteritems())[1]
+        else:
+            # If the currently selected leader is not marked as '-1',
+            # select a new leader from available members.
+            leader = group_people[group_people['Leader']
+                                  == 0].iloc[0]['Email']
+            # print(leader)
         # Set the leader status for the assigned leader
         df.loc[df['Email'] == leader, 'Leader'] = 1
+        # print(leaders)
+        # print("this is leader: ")
+        # print(leader)
+        # print("this is value of leader: ")
+        # print(df.loc[df['Email'] == leader, 'Leader'])
 
         # Update the past leaders column
-        df.loc[df['Email'].isin(
-            group_people['Email']), 'Past Leaders'] += leader + ','
+        # df.loc[df['Email'].isin(group_people['Email']),
+        #        'Past Leaders'] += leader + ','
 
-        # Append the group data to the groups list
-        groups.append(pd.DataFrame({
+        # Append the group data to the groups list, maintaining '-1' for leaders
+        # print(group_people['Leader'])
+        # print("this is email: ")
+        # print(group_people['Email'])
+        # print(group_people['Leader'])
+        group_data = {
             'Time Slot': time_slot,
             'Group': i + 1,
-            'Leader': [1] + [0] * (3 + leftover),
+            # choose the first member of the group as the leader if the leader is not -1.
+            # The rest of the members should be marked 0 if the are not -1.
+            # for x,y in email:
+            # (x,y)
+            'Leader': [1 if x == leader else y for (x, y) in zip(group_people['Email'], group_people['Leader'])],
             'Email': group_people['Email']
-        }))
+        }
+        groups.append(pd.DataFrame(group_data))
 
-        # Add the used leader to the set
+        # Add the used leader to the set for this time slot
         used_leaders.add(leader)
 
 # Concatenate the groups list into a single DataFrame
