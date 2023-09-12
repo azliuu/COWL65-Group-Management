@@ -8,11 +8,16 @@ df = pd.read_excel('data/input.xlsx')
 # df['Past Leaders'] = ''
 
 # Sort the DataFrame by time slot and first name
+print("this is timeslot", df['Time Slot'])
+# print(df.sort_values(['Time Slot'], inplace=True))
 df.sort_values(['Time Slot'], inplace=True)
 
-# Mark leaders with '1' as '-1' when first read and reset Leader column
+# if leader column doesn't exist create leader column
+if 'Leader' not in df.columns:
+    df['Leader'] = 0
+
 for index, row in df.iterrows():
-    if row['Leader'] == 1:
+    if (row['Leader'] == 1):
         df.at[index, 'Leader'] = -1
 
 # Group the DataFrame by time slot
@@ -53,6 +58,13 @@ for time_slot, time_slot_data in grouped:
 
        # Find a unique leader for the group
         leader = group_people.iloc[0]['Email']
+        print("leader: ")
+        print(leader)
+        print("group people: ")
+        print(group_people)
+        # print(group_people[group_people['Leader']])
+        # print("gp e")
+        # print(group_people['Email'][0])
         # while (
         # leader in group_people['Email'].values or
         # leader in used_leaders or
@@ -60,14 +72,20 @@ for time_slot, time_slot_data in grouped:
         # ):
         # If the currently selected leader is marked as '-1',
         # try to find a member marked as '0' to be the new leader.
-        if df.loc[df['Email'] == leader, 'Leader'].any() == -1:
+        # print("hihi")
+        # print(df.loc[df['Email'] == leader, 'Leader'].any())
+        # print("row")
+        # print(df.loc[df['Email'] == leader])
+        # print("leader")
+        # # print(df.loc[df['Leader']])
+        if df.loc[df['Email'] == leader, 'Leader'].any():
             new_leader_candidates = group_people[group_people['Leader'] == 0]
             if not new_leader_candidates.empty:
                 leader = new_leader_candidates.iloc[0]['Email']
             else:
                 # If no '0' leader candidates are available, select a member marked as '-1'.
-                leader = next(
-                    group_people[group_people['Leader'] == -1]['Email'].iteritems())[1]
+                leader = group_people[group_people['Leader']
+                                      == -1].iloc[0]['Email']
         else:
             # If the currently selected leader is not marked as '-1',
             # select a new leader from available members.
