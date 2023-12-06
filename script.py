@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import subprocess
 
-subprocess.run[("pip", "install", "openpyxl")]
+subprocess.run(["pip", "install", "openpyxl"])
 # from st_agrid import AgGrid
 
 st.title("COWL 65 Group Generator")
