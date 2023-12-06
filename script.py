@@ -1,8 +1,12 @@
+import openpyxl
+from itertools import cycle
 import pandas as pd
 import streamlit as st
+import subprocess
+
+subprocess.run(["pip", "install", "openpyxl"])
+
 # from st_agrid import AgGrid
-from itertools import cycle
-import openpyxl
 
 st.title("COWL 65 Group Generator")
 file = st.file_uploader("Upload file", type=["xlsx"])
