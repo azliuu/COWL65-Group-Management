@@ -1,16 +1,6 @@
 from itertools import cycle
 import pandas as pd
 import streamlit as st
-import sys
-import subprocess
-
-# Install openpyxl if not installed
-try:
-    import openpyxl
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "openpyxl"])
-    import openpyxl  # Now try to import again
-
 
 # from st_agrid import AgGrid
 
