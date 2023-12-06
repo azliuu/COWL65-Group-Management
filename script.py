@@ -1,6 +1,7 @@
 from itertools import cycle
 import pandas as pd
-import streamlit as stimport sys
+import streamlit as st
+import sys
 import subprocess
 
 # Install openpyxl if not installed
