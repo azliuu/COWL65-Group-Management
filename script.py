@@ -2,9 +2,7 @@ from itertools import cycle
 import pandas as pd
 import streamlit as st
 
-# from st_agrid import AgGrid
-
-st.title("Meaning Love and Paradox Group Generator")
+st.title("Meaning, Paradox, and Love Group Generator")
 file = st.file_uploader("Upload file", type=["xlsx"])
 
 
@@ -13,12 +11,7 @@ try:
     if file is not None:
         df = pd.read_excel(file)
 
-        # # Add an empty "Past Leaders" column to the DataFrame
-        # df['Past Leaders'] = ''
-
         # Sort the DataFrame by Section and first name
-        # print("this is timeslot", df['Section'])
-        # print(df.sort_values(['Section'], inplace=True))
         df.sort_values(['Section'], inplace=True)
 
         # if leader column doesn't exist create leader column
@@ -68,26 +61,7 @@ try:
 
             # Find a unique leader for the group
                 leader = group_people.iloc[0]['Email Address']
-                # print("leader: ")
-                # print(leader)
-                # print("group people: ")
-                # print(group_people)
-                # print(group_people[group_people['Leader']])
-                # print("gp e")
-                # print(group_people['Email Address Address'][0])
-                # while (
-                # leader in group_people['Email Address'].values or
-                # leader in used_leaders or
-                # (df.loc[df['Email Address'] == leader, 'Leader'].any() == -1)
-                # ):
-                # If the currently selected leader is marked as '-1',
-                # try to find a member marked as '0' to be the new leader.
-                # print("hihi")
-                # print(df.loc[df['Email Address'] == leader, 'Leader'].any())
-                # print("row")
-                # print(df.loc[df['Email Address'] == leader])
-                # print("leader")
-                # # print(df.loc[df['Leader']])
+
                 if df.loc[df['Email Address'] == leader, 'Leader'].any():
                     new_leader_candidates = group_people[group_people['Leader'] == 0]
                     if not new_leader_candidates.empty:
@@ -110,39 +84,10 @@ try:
                     'Group': i + 1,
                     # choose the first member of the group as the leader if the leader is not -1.
                     # The rest of the members should be marked 0 if the are not -1.
-                    # for x,y in Email Address:
-                    # (x,y)
                     'Leader': [1 if x == leader else y for (x, y) in zip(group_people['Email Address'], group_people['Leader'])],
                     'Email Address': group_people['Email Address']
                 }
                 groups.append(pd.DataFrame(group_data))
-
-                # print("leader")
-                # print(df['Leader'])
-                # df.style.highlight_max(subset=['Leader'] == 1, color='yellow')
-                # # color all the leaders orange
-                # print("bizza3")
-
-                # def color_leader(col):
-                #     if col.name == 'Leader':
-                #         print("bizza4")
-                #         return ['background-color: orange' if x == 1 else '' for x in col]
-
-                # color all the leaders orange
-                # data = pd.DataFrame(group_data)
-                # data.style.apply(color_leader)
-
-                # print("bizza5")
-                # def color_leader(s):
-                #     """
-                #     function to color the leader
-                #     """
-                #     print("s")
-                #     print(s['Leader'])
-                #     if s['Leader'] == 1:
-                #         return 'background-color: yellow'
-                #     else:
-                #         return ''
 
                 # Add the used leader to the set for this Section
                 used_leaders.add(leader)
@@ -185,7 +130,7 @@ try:
 
         excel_data = download_excel()
         st.download_button(label='Click to Download', data=excel_data,
-                           file_name='cowl65_groups.xlsx', key='excel_download')
+                           file_name='mpl_groups.xlsx', key='excel_download')
 
         # Display the styled DataFrame in the Streamlit app
         styled_df.set_properties(**{'max-width': '100px', 'font-size': '10pt'})
