@@ -145,9 +145,9 @@ try:
 
     with col1:
         st.markdown("Alex Liu")
-        st.markdown("<a href='https://www.linkedin.com/in/alex-liu-8689a1171/'><img src='https://static-00.iconduck.com/assets.00/linkedin-icon-1024x1024-net2o24e.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/azliuu'><img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='32' height='32'></a>", unsafe_allow_html=True)
+        st.markdown("<a href='https://www.linkedin.com/in/alex-liu-8689a1171/'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/azliuu'><img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0Uu0auB-_30X62d-vUYM-jhN4TkqPqgv6A&usqp=CAU' width='32' height='32'></a>", unsafe_allow_html=True)
     with col2:
         st.markdown("Kevin Young")
-        st.markdown("<a href='https://www.linkedin.com/in/kev-you/'><img src='https://static-00.iconduck.com/assets.00/linkedin-icon-1024x1024-net2o24e.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/keiayoun'><img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='32' height='32'></a>", unsafe_allow_html=True)
+        st.markdown("<a href='https://www.linkedin.com/in/kev-you/'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/keiayoun'><img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN0Uu0auB-_30X62d-vUYM-jhN4TkqPqgv6A&usqp=CAU' width='32' height='32'></a>", unsafe_allow_html=True)
 except:
     st.header("Sorry! Program Error. Please check your input file and try again.")
