@@ -140,5 +140,14 @@ try:
         st.markdown(styled_df.to_html(escape=False), unsafe_allow_html=True)
     st.divider()
     st.subheader("Made with <3 by Alex Liu and Kevin Young.")
+    st.text("Let's work together to build one more thing.")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("Alex Liu")
+        st.markdown("<a href='https://www.linkedin.com/in/alex-liu-8689a1171/'><img src='https://static-00.iconduck.com/assets.00/linkedin-icon-1024x1024-net2o24e.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/azliuu'><img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='32' height='32'></a>", unsafe_allow_html=True)
+    with col2:
+        st.markdown("Kevin Young")
+        st.markdown("<a href='https://www.linkedin.com/in/kev-you/'><img src='https://static-00.iconduck.com/assets.00/linkedin-icon-1024x1024-net2o24e.png' width='42' height='32' style='padding-right: 10px'></a><a href='https://github.com/keiayoun'><img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' width='32' height='32'></a>", unsafe_allow_html=True)
 except:
     st.header("Sorry! Program Error. Please check your input file and try again.")
